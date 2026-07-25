@@ -1,0 +1,24 @@
+# Market Monitor — .gitignore (Phase 4a, 2026-07-24)
+# This repository is PUBLIC (D1). Everything not listed as tracked is assumed
+# local-only; this file makes that assumption explicit and mechanical.
+
+# --- Credentials: never committed (uwa §2 hard rule) -----------------------
+# The canonical home for every credential is C:\_Secrets, outside this tree.
+.env
+.env.*
+*.key
+*.pem
+
+# --- Local-only working files (the untracked-local class, 4a) --------------
+*command instructions.txt
+
+# --- Generated at runtime ---------------------------------------------------
+cache/
+logs/
+__pycache__/
+*.pyc
+
+# --- Reports: only the published page is tracked (D2) ----------------------
+# docs/index.html is force-added by the workflow's publish step.
+docs/*
+!docs/index.html
