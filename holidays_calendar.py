@@ -149,13 +149,22 @@ SINGAPORE_HOLIDAYS = {
     date(2025, 8, 9):   "National Day",
     date(2025, 10, 20): "Deepavali",
     date(2025, 12, 25): "Christmas Day",
-    # 2026
+    # 2026 — corrected 2026-07-25 against two independent providers
+    # (markethours.io + forexchurch.com, in full agreement): National Day
+    # fell Sun 9 Aug — the closure is Mon 10 AUG (OBSERVED; prior entry sat
+    # on the Sunday and the real closure two weeks out was missing); Hari
+    # Raya Haji (27 May), Vesak (observed 1 Jun) and Deepavali (observed
+    # 9 Nov) were absent entirely — Nov 9 was a future-dated gap that would
+    # have raised a false STALE on STI at the Nov-10 run.
     date(2026, 1, 1):   "New Year's Day",
     date(2026, 2, 17):  "Chinese New Year",
     date(2026, 2, 18):  "Chinese New Year (Day 2)",
     date(2026, 4, 3):   "Good Friday",
     date(2026, 5, 1):   "Labour Day",
-    date(2026, 8, 9):   "National Day",
+    date(2026, 5, 27):  "Hari Raya Haji",
+    date(2026, 6, 1):   "Vesak Day (observed — 31 May fell on Sunday)",
+    date(2026, 8, 10):  "National Day (observed — 9 Aug fell on Sunday)",
+    date(2026, 11, 9):  "Deepavali (observed — 8 Nov fell on Sunday)",
     date(2026, 12, 25): "Christmas Day",
 }
 
@@ -234,12 +243,34 @@ CHINA_HOLIDAYS = {
     date(2025, 10, 3):  "National Day",
     date(2025, 10, 6):  "National Day",
     date(2025, 10, 7):  "National Day",
-    # 2026
+    # 2026 — full SSE/SZSE closure set, verified 2026-07-25 against three
+    # independent providers (markethours.io, forexchurch.com, calendarlabs.com;
+    # SSE's own English schedule page still listed only 2024-25 and SHFE's
+    # circular was bot-walled — both checked). All three agree on every date
+    # below; total 17 weekday closures. Prior table had 5 single-day entries,
+    # incl. Tomb Sweeping on Apr 5 — a SUNDAY in 2026; the actual closure was
+    # Mon Apr 6. NOTE: Jan 2 was claimed closed by 2 of 3 providers but open
+    # by the self-consistent one ("18 full closures" incl. weekend-adjacent
+    # count differences); date is past and inert for the forward-looking
+    # session detector — recorded here as unresolved rather than guessed.
     date(2026, 1, 1):   "New Year's Day",
+    date(2026, 2, 16):  "Spring Festival Eve",
     date(2026, 2, 17):  "Chinese New Year (Spring Festival)",
-    date(2026, 4, 5):   "Tomb Sweeping Day",
+    date(2026, 2, 18):  "Spring Festival",
+    date(2026, 2, 19):  "Spring Festival",
+    date(2026, 2, 20):  "Spring Festival",
+    date(2026, 2, 23):  "Spring Festival",
+    date(2026, 4, 6):   "Tomb Sweeping Day (observed — 5 Apr fell on Sunday)",
     date(2026, 5, 1):   "Labour Day",
+    date(2026, 5, 4):   "Labour Day Holiday",
+    date(2026, 5, 5):   "Labour Day Holiday",
+    date(2026, 6, 19):  "Dragon Boat Festival",
+    date(2026, 9, 25):  "Mid-Autumn Festival",
     date(2026, 10, 1):  "National Day Golden Week",
+    date(2026, 10, 2):  "National Day Golden Week",
+    date(2026, 10, 5):  "National Day Golden Week",
+    date(2026, 10, 6):  "National Day Golden Week",
+    date(2026, 10, 7):  "National Day Golden Week",
 }
 
 # ---------------------------------------------------------------------------
@@ -268,17 +299,26 @@ HONGKONG_HOLIDAYS = {
     date(2025, 10, 29): "Chung Yeung Festival",
     date(2025, 12, 25): "Christmas Day",
     date(2025, 12, 26): "Boxing Day",
-    # 2026
+    # 2026 — corrected 2026-07-25 against the official gov.hk general-holidays
+    # 2026 page (authoritative): Buddha's Birthday fell Sun 24 May — the
+    # closure was Mon 25 May (prior entry sat on the Sunday); Tue 7 Apr was an
+    # additional holiday the table missed; and Mon 19 Oct ("the day following
+    # Chung Yeung Festival" — festival falls on Sunday) IS a closure, the
+    # future-dated gap that would have raised a false STALE on ^HSCE at the
+    # Oct-20 run. Sat 26 Sep (day after Mid-Autumn) omitted deliberately —
+    # weekend, never an expected session.
     date(2026, 1, 1):   "New Year's Day",
     date(2026, 2, 17):  "Lunar New Year",
     date(2026, 2, 18):  "Lunar New Year",
     date(2026, 2, 19):  "Lunar New Year",
     date(2026, 4, 3):   "Good Friday",
     date(2026, 4, 6):   "Easter Monday / Ching Ming",
+    date(2026, 4, 7):   "Additional holiday (Easter/Ching Ming week)",
     date(2026, 5, 1):   "Labour Day",
-    date(2026, 5, 24):  "Buddha's Birthday",
+    date(2026, 5, 25):  "Buddha's Birthday (observed — 24 May fell on Sunday)",
     date(2026, 7, 1):   "HKSAR Establishment Day",
     date(2026, 10, 1):  "National Day",
+    date(2026, 10, 19): "Day following Chung Yeung Festival",
     date(2026, 12, 25): "Christmas Day",
     date(2026, 12, 26): "Boxing Day",
 }
