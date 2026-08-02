@@ -2,9 +2,12 @@
 validator.py — Data quality validation rules
 Phase 2b: all geographies, OAS, FX, crypto outlier thresholds
 Phase 2k: commodity stale threshold split from FX — STALE_DAYS_COMMODITY=2 (yfinance daily)
+Phase 4h: run-to-run monotonicity assertion (G-12 leg 2) — no series' as-of
+          may move backwards between runs; prior run = committed docs/index.html
 """
 
 import logging
+import re
 from datetime import datetime, date, timedelta
 
 import pandas as pd
@@ -317,6 +320,49 @@ def run_all(
     }
 
     return flags
+
+
+# ---------------------------------------------------------------------------
+# Phase 4h — run-to-run monotonicity (G-12 leg 2, Team AI handoff 2026-07-27)
+# ---------------------------------------------------------------------------
+# The 2026-07-27 incident: a later run emailed OLDER prints than its own
+# predecessor (9 of 9 equity/REIT series regressed one session), and the
+# session-aware flags structurally could not see it — they measure
+# distance-from-session, not distance-from-previous-run. The prior run's
+# committed docs/index.html (present in the Actions checkout) is the
+# persistence layer; its per-row "as of" dates are the previous run's record.
+ASOF_ROW_RE = re.compile(
+    r"<small style='color:#999'>([^<]+)</small>(?:(?!</td>).)*?as of (\d{4}-\d{2}-\d{2})",
+    re.S,
+)
+
+
+def report_asof_dates(html: str) -> dict:
+    """Per-series as-of dates parsed from a rendered report: {ticker: date}."""
+    return {t.strip(): d for t, d in ASOF_ROW_RE.findall(html)}
+
+
+def check_run_regression(prev_html: str, new_html: str, flags: dict) -> list:
+    """Assert no series' as-of date moved backwards vs the previous run.
+
+    Appends a 'regression' flag category and re-bases _summary when any
+    series regressed. Detection only — which run governs which block is the
+    newsletter's Pipeline §3A rule, not MM's call. ISO dates compare as
+    strings. A series absent from either run is not a regression (absence
+    is its own flag class)."""
+    prev, new = report_asof_dates(prev_html), report_asof_dates(new_html)
+    msgs = [
+        f"{t}: as-of REGRESSED {prev[t]} → {new[t]} (prior run's print was newer)"
+        for t in sorted(set(prev) & set(new))
+        if new[t] < prev[t]
+    ]
+    if msgs:
+        flags["regression"] = msgs
+        total = sum(len(v) for k, v in flags.items()
+                    if not k.startswith("_") and isinstance(v, list))
+        flags["_summary"]["total"] = total
+        flags["_summary"]["has_flags"] = True
+    return msgs
 
 
 def email_subject(flags: dict) -> str:

@@ -39,7 +39,7 @@ from calculator import (
     commodity_stats as calc_commodity_stats,
     reit_stats as calc_reit_stats,
 )
-from validator import run_all, email_subject
+from validator import run_all, email_subject, check_run_regression
 from report_generator import build_report
 
 # ---------------------------------------------------------------------------
@@ -157,12 +157,39 @@ def run():
         flags=flags,
     )
 
+    # Phase 4h (G-12 leg 2): run-to-run monotonicity assertion. The prior
+    # run's committed docs/index.html is read BEFORE this run overwrites it;
+    # any series whose as-of date moved backwards is flagged loudly (footer
+    # category + banner count + ⚠️ subject) and the report is re-rendered so
+    # the flag ships in the same artifact it describes. Detection never
+    # blocks the report — an older print is a defect to surface, not a
+    # reason to publish nothing.
+    os.makedirs("docs", exist_ok=True)
+    out_file = os.path.join("docs", "index.html")
+    if os.path.exists(out_file):
+        with open(out_file, encoding="utf-8") as f:
+            prev_html = f.read()
+        regressions = check_run_regression(prev_html, html, flags)
+        if regressions:
+            logger.warning(
+                f"{len(regressions)} run-to-run as-of regression(s) — "
+                f"G-12 class; re-rendering report with regression flags"
+            )
+            html = build_report(
+                stress_stats=stress_stats,
+                equity_stats=equity_stats,
+                rate_stats=rate_stats_d,
+                credit_stats=credit_stats,
+                reit_stats=reit_stats_d,
+                commodity_stats=comm_stats,
+                fx_stats=fx_stats_d,
+                flags=flags,
+            )
+
     # Phase 4b (D2): docs/index.html is the ONLY report file in the repo.
     # The timestamped companion is retired — it accumulated one file per run
     # in a repo that is now public and served by GitHub Pages, and nothing
     # read it. History lives in git, not in a directory of dated copies.
-    os.makedirs("docs", exist_ok=True)
-    out_file = os.path.join("docs", "index.html")
     with open(out_file, "w", encoding="utf-8") as f:
         f.write(html)
     logger.info(f"Report written: {out_file}")
